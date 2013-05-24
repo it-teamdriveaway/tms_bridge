@@ -12,7 +12,7 @@ module PublishesTms
 
       before_filter :parse_iron_mq_json if respond_to?(:before_filter)
  
-      class_name = self.published_resource.classify
+      class_name = self.published_resources.classify
   
     class_eval <<-RUBY, __FILE__, __LINE__+1
       def create
