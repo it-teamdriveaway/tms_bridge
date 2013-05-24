@@ -26,6 +26,12 @@ describe PublishesTms do
     end
   end
 
+  describe "methods" do
+    it "should define 'create'" do
+      MockController.new.should respond_to(:create)
+    end
+  end
+
   describe "validate_bridge_request?" do
     def do_prep
       controller.class_eval do

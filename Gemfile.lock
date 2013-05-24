@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tms_bridge (0.0.3)
+    tms_bridge (0.0.4)
       actionpack (>= 3.2.0)
       iron_cache
       uuidtools
