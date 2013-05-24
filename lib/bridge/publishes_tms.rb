@@ -6,6 +6,9 @@ module PublishesTms
       include PublishesTms::InstanceMethods unless included_modules.include?(PublishesTms::InstanceMethods)
       
       self.as = as.to_s
+      self.published_resource = self.name.split('::').last.gsub(/Controller/, '').underscore
+      self.queue_name = self.as + '_'+self.published_resource
+
       before_filter :parse_iron_mq_json if respond_to?(:before_filter)
  
     end
@@ -25,8 +28,7 @@ module PublishesTms
 
     def valid_bridge_request?
       if @json && @json['cache_key']
-        queue_name = as + '_'+self.class.name.gsub(/Bridge\:\:|Controller/, '').underscore
-        value = Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@json['tms_id']}--#{queue_name}--#{IronCacher::CACHE_NAME}--")
+        value = Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@json['tms_id']}--#{self.class.queue_name}--#{IronCacher::CACHE_NAME}--")
         return value == retrieve_from_cache(@json['cache_key'], IronCacher::CACHE_NAME)
       end
     end  
@@ -35,6 +37,8 @@ module PublishesTms
   module ClassMethods
     def self.extended(base)
       base.class_attribute(:as)
+      base.class_attribute(:published_resource)
+      base.class_attribute(:queue_name)
     end
   end
 end

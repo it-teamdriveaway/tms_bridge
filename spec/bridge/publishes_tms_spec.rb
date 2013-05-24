@@ -8,6 +8,24 @@ describe PublishesTms do
     publishes_tms :some_client
     attr_accessor :json
   end
+
+  describe "class_attributes" do
+    before(:each) do
+      @controller ||= MockController.new
+    end
+    it "should define and set 'as' " do
+      @controller.as.should == 'some_client'
+    end
+
+    it "should define and set 'published_resource' " do
+      @controller.published_resource.should == 'mock'
+    end
+
+    it "should define and set 'queue_name' " do
+      @controller.queue_name.should == 'some_client_mock'      
+    end
+  end
+
   describe "validate_bridge_request?" do
     def do_prep
       controller.class_eval do
