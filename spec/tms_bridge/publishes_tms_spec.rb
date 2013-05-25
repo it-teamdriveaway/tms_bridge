@@ -1,4 +1,4 @@
-require 'bridge'
+require 'tms_bridge'
 require 'iron_cacher'
 describe PublishesTms do
   include IronCacher

@@ -1,8 +1,8 @@
-require "bridge/version"
+require "tms_bridge/version"
 require 'uuidtools'
 require "iron_cacher"
 require 'action_controller'
-require "bridge/publishes_tms"
+require "tms_bridge/publishes_tms"
 module Bridge
 
 end
