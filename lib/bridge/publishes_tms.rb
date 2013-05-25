@@ -17,7 +17,7 @@ module PublishesTms
     class_eval <<-RUBY, __FILE__, __LINE__+1
       def create
         @#{self.published_resource} = #{class_name}.find_by_tms_id(@json['tms_id']) || #{class_name}.new
-        @#{self.published_resource}.attributes = @json['address']
+        @#{self.published_resource}.attributes = @json['#{self.published_resource}']
         @#{self.published_resource}.save(validate: false)
 
         render text: 'success'
