@@ -1,17 +1,20 @@
 require 'iron_cacher'
 module TmsBridge
   module ControllerSupport
-    module Base
-      def publishes_tms(as)
-        extend TmsBridge::ControllerSupport::ClassMethods unless (class << self; included_modules; end).include?(TmsBridge::ControllerSupport::ClassMethods)
-        include TmsBridge::ControllerSupport::InstanceMethods unless included_modules.include?(TmsBridge::ControllerSupport::InstanceMethods)
+    module Redact
       
+    end
+    module Publish
+      def publishes_tms(as)
+        extend TmsBridge::ControllerSupport::Publish::ClassMethods unless (class << self; included_modules; end).include?(TmsBridge::ControllerSupport::Publish::ClassMethods)
+        include TmsBridge::ControllerSupport::Publish::InstanceMethods unless included_modules.include?(TmsBridge::ControllerSupport::Publish::InstanceMethods)
+
         self.as = as.to_s
         self.published_resources = self.name.split('::').last.gsub(/Controller/, '').underscore
         self.published_resource = self.published_resources.singularize
-        self.queue_name = self.as + '_'+self.published_resources
 
-        before_filter :parse_iron_mq_json if respond_to?(:before_filter)
+        include TmsBridge::ControllerSupport::Security unless included_modules.include?(TmsBridge::ControllerSupport::Security)
+        self.queue_name = self.as + '_'+self.published_resources
  
         class_name = self.published_resources.classify
   
@@ -28,11 +31,30 @@ module TmsBridge
   
  
       end
-    end
+      
+      module InstanceMethods
+        def self.included(base)
+          base.send(:include, TmsBridge::ControllerSupport::Security)
+        end
+      end
   
-    module InstanceMethods
+      module ClassMethods
+        def self.extended(base)
+          base.class_attribute(:as)
+          base.class_attribute(:published_resource)
+          base.class_attribute(:published_resources)
+        end
+      end      
+    end
+
+    module Security
       include IronCacher
-    
+      
+      def self.included(base)
+        base.class_attribute(:queue_name)
+        base.before_filter :parse_iron_mq_json
+      end
+  
       protected
       def parse_iron_mq_json
         @json=JSON.parse(request.raw_post) unless request.raw_post.blank?
@@ -47,18 +69,13 @@ module TmsBridge
           value = Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@json['tms_id']}--#{self.class.queue_name}--#{IronCacher::CACHE_NAME}--")
           return value == retrieve_from_cache(@json['cache_key'], IronCacher::CACHE_NAME)
         end
-      end  
+      end      
     end
-  
-    module ClassMethods
-      def self.extended(base)
-        base.class_attribute(:as)
-        base.class_attribute(:published_resource)
-        base.class_attribute(:published_resources)
-        base.class_attribute(:queue_name)
-      end
-    end
+
+
   end
+  
+  
 end
 
-ActionController::Base.send(:extend, TmsBridge::ControllerSupport::Base)
+ActionController::Base.send(:extend, TmsBridge::ControllerSupport::Publish)

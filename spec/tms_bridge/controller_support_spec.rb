@@ -1,15 +1,102 @@
 require 'rspec'
 require 'tms_bridge'
-describe TmsBridge::ControllerSupport do
+
+describe TmsBridge::ControllerSupport::Security do
+  include IronCacher
+  
+  class MockRequest
+    attr_accessor :raw_post
+  end
+
+  class SecurityController
+    attr_accessor :json
+    attr_reader :request
+    
+    def self.before_filter(*args);end
+    include TmsBridge::ControllerSupport::Security
+    self.queue_name = 'some_secure_queue_name'
+    
+    def initialize
+      @request = MockRequest.new
+    end
+    
+    def head(*args)
+    end
+  end
+  
+  describe "validate_bridge_request?" do
+    before(:each) do
+      @cache_key = 'cache_key'
+      @tms_id = Time.now.to_i
+      @digest = Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@tms_id}--some_secure_queue_name--#{IronCacher::CACHE_NAME}--")
+      yield if block_given?
+      add_to_cache(@cache_key, @digest)
+    end
+    def controller
+      @controller ||= SecurityController.new
+    end
+    
+    it "should do something " do
+      controller.json = {'cache_key'=>@cache_key, 'tms_id'=>@tms_id}      
+      controller.should be_valid_bridge_request
+    end
+    
+    it "should be false if the hash does not match" do
+      controller.json = {'cache_key'=>Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@tms_id}--does_not_match--#{IronCacher::CACHE_NAME}--"), 'tms_id'=>@tms_id}      
+      controller.should_not be_valid_bridge_request
+    end
+    
+    it "should be false if the cache value is not found" do
+      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
+      controller.should_not be_valid_bridge_request
+    end
+  
+    it "should be false if json is null" do
+      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
+      controller.json = nil
+      controller.should_not be_valid_bridge_request
+    end
+  
+    it "should be false if no cache_key was passed" do
+      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
+      controller.json = {'tms_id'=>@tms_id}      
+      controller.should_not be_valid_bridge_request
+    end
+    
+  end
+  
+  describe "parse_iron_mq_json" do
+    def controller
+      @controller ||= SecurityController.new
+    end
+
+    it "should set the json attribute and return nil" do
+      controller.request.raw_post=({:tms_id=>17}.to_json)
+      controller.send(:parse_iron_mq_json).should be_nil
+      controller.json.class.should eq(Hash)
+    end
+    
+    it "should return false and call head with :ok, if tms_id is not present" do
+      controller.request.raw_post= nil
+      controller.should_receive(:head).with(:ok)
+      controller.send(:parse_iron_mq_json).should == false
+    end
+    
+  end
+end
+
+describe TmsBridge::ControllerSupport::Publish do
   include IronCacher
   
   class MocksController
-    extend TmsBridge::ControllerSupport::Base
-    publishes_tms :some_client
     attr_accessor :json
     attr_reader :mock
-    def render(*args)
-    end
+
+    def self.before_filter(*args);end
+    def render(*args);end
+
+    extend TmsBridge::ControllerSupport::Publish
+    publishes_tms :some_client
   end
 
   class FoundMock
@@ -62,49 +149,6 @@ describe TmsBridge::ControllerSupport do
     it "should define 'create'" do
       MocksController.new.should respond_to(:create)
     end
-  end
-
-  describe "validate_bridge_request?" do
-    def do_prep
-      @cache_key = 'cache_key'
-      @tms_id = Time.now.to_i
-      @digest = Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@tms_id}--some_client_mocks--#{IronCacher::CACHE_NAME}--")
-      yield if block_given?
-      add_to_cache(@cache_key, @digest)
-    end
-    
-    it "should do something " do
-      do_prep
-      controller.json = {'cache_key'=>@cache_key, 'tms_id'=>@tms_id}      
-      controller.should be_valid_bridge_request
-    end
-    
-    it "should be false if the hash does not match" do
-      do_prep
-      controller.json = {'cache_key'=>Digest::SHA2.hexdigest("---#{ENV['CC_BRIDGE_SALT']}--#{@tms_id}--some_client_mock_deletes--#{IronCacher::CACHE_NAME}--"), 'tms_id'=>@tms_id}      
-      controller.should_not be_valid_bridge_request
-    end
-    
-    it "should be false if the cache value is not found" do
-      do_prep
-      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
-      controller.should_not be_valid_bridge_request
-    end
-
-    it "should be false if json is null" do
-      do_prep
-      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
-      controller.json = nil
-      controller.should_not be_valid_bridge_request
-    end
-
-    it "should be false if no cache_key was passed" do
-      do_prep
-      iron_cache(IronCacher::CACHE_NAME).delete(@cache_key)
-      controller.json = {'tms_id'=>@tms_id}      
-      controller.should_not be_valid_bridge_request
-    end
-    
   end
   
   describe "create" do
