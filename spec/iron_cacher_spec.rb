@@ -1,6 +1,5 @@
 require 'rspec'
-RAILS_ENV ||='test'
-require File.expand_path(File.dirname(__FILE__) + '/../../lib/iron_cacher')
+require File.expand_path(File.dirname(__FILE__) + '/../lib/iron_cacher')
 
 describe IronCacher do
   class MockIronCache

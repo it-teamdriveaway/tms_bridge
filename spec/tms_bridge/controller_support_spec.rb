@@ -1,5 +1,5 @@
+require 'rspec'
 require 'tms_bridge'
-require 'iron_cacher'
 describe TmsBridge::ControllerSupport do
   include IronCacher
   
