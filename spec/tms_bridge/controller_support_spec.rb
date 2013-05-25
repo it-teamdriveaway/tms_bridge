@@ -1,10 +1,10 @@
 require 'tms_bridge'
 require 'iron_cacher'
-describe PublishesTms do
+describe TmsBridge::ControllerSupport do
   include IronCacher
   
   class MockController
-    extend PublishesTms::Base
+    extend TmsBridge::ControllerSupport::Base
     publishes_tms :some_client
     attr_accessor :json
   end
