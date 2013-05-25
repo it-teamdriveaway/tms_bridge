@@ -169,9 +169,11 @@ describe TmsBridge::ControllerSupport::Redact do
         controller.should_receive(:render).with(text: 'success')
         controller.create
       end
-      it "should now throw an error if the record is not found" do
+      it "should not throw an error if the record is not found" do
         controller.json={'record_class'=>'MockModel', 'tms_id'=>MockModel::NOT_FOUND}
         controller.record.should be_nil
+        controller.should_receive(:render).with(text: 'success')
+        controller.create
       end
 
     end

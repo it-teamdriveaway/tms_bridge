@@ -17,8 +17,8 @@ class_eval <<-RUBY, __FILE__, __LINE__+1
           if @record_class
             if @record = @record_class.find_by_tms_id(@json['tms_id'])
               @record.destroy
-              render text: 'success'
             end
+            render text: 'success'
           else
             head :ok
           end
