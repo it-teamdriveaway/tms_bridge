@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tms_bridge (0.0.7)
+    tms_bridge (0.0.8)
       actionpack (>= 3.2.0)
       activerecord (>= 3.2.0)
       iron_cache
