@@ -1,7 +1,14 @@
 class MockModel
   attr_accessor :attributes, :called_save, :called_destroy
+  
+  extend TmsBridge::ModelSupport
   NOT_FOUND=false
   FOUND=true
+
+  def self.column_names
+    ['updated_at', 'created_at', 'id', 'name']
+  end
+
   def save(*args)
     self.called_save = true
   end

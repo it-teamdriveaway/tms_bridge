@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    tms_bridge (0.0.6)
+    tms_bridge (0.0.7)
       actionpack (>= 3.2.0)
+      activerecord (>= 3.2.0)
       iron_cache
       typhoeus
       uuidtools
@@ -23,9 +24,15 @@ GEM
     activemodel (3.2.13)
       activesupport (= 3.2.13)
       builder (~> 3.0.0)
+    activerecord (3.2.13)
+      activemodel (= 3.2.13)
+      activesupport (= 3.2.13)
+      arel (~> 3.0.2)
+      tzinfo (~> 0.3.29)
     activesupport (3.2.13)
       i18n (= 0.6.1)
       multi_json (~> 1.0)
+    arel (3.0.2)
     builder (3.0.4)
     diff-lcs (1.2.4)
     erubis (2.7.0)
@@ -33,7 +40,7 @@ GEM
       ffi (>= 1.3.0)
       mime-types (~> 1.18)
     ffi (1.8.1)
-    hike (1.2.2)
+    hike (1.2.3)
     i18n (0.6.1)
     iron_cache (1.4.0)
       iron_core (>= 0.5.1)
@@ -41,7 +48,7 @@ GEM
       rest (>= 2.2.0)
     journey (1.0.4)
     mime-types (1.23)
-    multi_json (1.7.3)
+    multi_json (1.7.6)
     net-http-persistent (2.8)
     rack (1.4.5)
     rack-cache (1.2)
@@ -70,6 +77,7 @@ GEM
     tilt (1.4.1)
     typhoeus (0.6.3)
       ethon (~> 0.5.11)
+    tzinfo (0.3.37)
     uuidtools (2.1.4)
 
 PLATFORMS
