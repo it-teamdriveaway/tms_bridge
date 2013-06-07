@@ -175,7 +175,6 @@ describe TmsBridge::ControllerSupport::Redact do
         controller.should_receive(:render).with(text: 'success')
         controller.create
       end
-
     end
   end
   describe "if an invalid record class is passed" do
@@ -212,7 +211,7 @@ describe TmsBridge::ControllerSupport::Publish do
 
   describe "create" do
     before(:each) do
-      @attributes = {some_key: 'some value'}
+      @attributes = {'some_key'=>'some value'}
       @tms_id = MockPublishing::NOT_FOUND
       controller.json = {'mock_publishing'=>@attributes, 'tms_id'=>@tms_id}
     end
@@ -234,6 +233,12 @@ describe TmsBridge::ControllerSupport::Publish do
 
     it "it should call MockPublishing.new if MockPublishing.find_by_tms_id returns nil" do
       MockPublishing.should_receive(:new)
+      controller.create
+    end
+    
+    it "should not pass attributes to the mock model taht are not supported" do
+      puts MockPublishing.published_attribute_names
+      MockPublishing.should_receive(:published_attribute_names){['some_key']}
       controller.create
     end
     

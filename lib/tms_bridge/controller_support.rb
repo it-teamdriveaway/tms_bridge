@@ -51,7 +51,7 @@ RUBY
         def create
           @#{self.bridged_resource} = #{class_name}.find_by_tms_id(@json['tms_id']) || #{class_name}.new
           if @#{self.bridged_resource}
-            @#{self.bridged_resource}.attributes = @json['#{self.bridged_resource}']
+            @#{self.bridged_resource}.attributes = @json['#{self.bridged_resource}'].slice(*#{class_name}.published_attribute_names)
             @#{self.bridged_resource}.save(validate: false)
           end
           render text: 'success'

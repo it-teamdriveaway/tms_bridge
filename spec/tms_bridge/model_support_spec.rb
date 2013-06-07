@@ -17,7 +17,7 @@ describe TmsBridge::ModelSupport do
     end
     
     it "should include items declared in column_names" do
-      MockModel.published_attribute_names.should include('name')
+      MockModel.published_attribute_names.should include('some_key')
     end
   end
 end

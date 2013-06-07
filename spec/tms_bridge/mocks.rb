@@ -6,7 +6,7 @@ class MockModel
   FOUND=true
 
   def self.column_names
-    ['updated_at', 'created_at', 'id', 'name']
+    ['updated_at', 'created_at', 'id', 'some_key']
   end
 
   def save(*args)
