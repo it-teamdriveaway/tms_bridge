@@ -207,6 +207,10 @@ describe TmsBridge::ControllerSupport::Publish do
     it "should extend security" do
       (class << MockPublishingsController; included_modules; end).should include(TmsBridge::ControllerSupport::Security)
     end
+    
+    it "should support update_only?" do
+      controller.update_only?.should == controller.class.update_only
+    end
   end
 
   describe "create" do
@@ -245,6 +249,13 @@ describe TmsBridge::ControllerSupport::Publish do
     it "it should call MockPublishing.new if MockPublishing.find_by_tms_id returns nothing" do
       controller.json = {'mock_publishing'=>@attributes, 'tms_id'=>MockPublishing::NOT_FOUND}      
       MockPublishing.should_receive(:new)
+      controller.create
+    end
+    
+    it "it should call MockPublishing.new if MockPublishing.find_by_tms_id returns nothing and update_only? == true" do
+      controller.json = {'mock_publishing'=>@attributes, 'tms_id'=>MockPublishing::NOT_FOUND}      
+      MockPublishing.should_not_receive(:new)
+      controller.stub(:update_only?){true}
       controller.create
     end
     
