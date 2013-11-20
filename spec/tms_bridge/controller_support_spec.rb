@@ -217,7 +217,8 @@ describe TmsBridge::ControllerSupport::Publish do
     before(:each) do
       @attributes = {'some_key'=>'some value'}
       @tms_id = MockPublishing::NOT_FOUND
-      controller.json = {'mock_publishing'=>@attributes, 'tms_id'=>@tms_id}
+      @bridge_id = 'somebridgeid'
+      controller.json = {'mock_publishing'=>@attributes, 'tms_id'=>@tms_id, 'bridge_id'=>@bridge_id}
     end
     
     it "should assign to the mock_publishing attribute" do
@@ -241,7 +242,6 @@ describe TmsBridge::ControllerSupport::Publish do
     end
     
     it "should not pass attributes to the mock model taht are not supported" do
-      puts MockPublishing.published_attribute_names
       MockPublishing.should_receive(:published_attribute_names){['some_key']}
       controller.create
     end
@@ -269,13 +269,21 @@ describe TmsBridge::ControllerSupport::Publish do
       controller.create
     end
     
-    it "should yield to find a model if block_given?" do
-      yielded = false
-      controller.create{
-        yielded = true
-        nil
-      }
-      yielded.should == true
+    it "should attempt a lookup of the model with bridge_id if not found by tms_id an supports bridge_id" do
+      MockPublishing.should_receive(:find_by_tms_id).with(@tms_id){nil}
+      column_names = MockPublishing.column_names + ['bridge_id']
+      MockPublishing.stub(:column_names){column_names}
+      MockPublishing.should_receive(:find_by_bridge_id).with(@bridge_id)
+      controller.create      
+    end
+
+    it "should attempt a lookup of the model with bridge_id if not found by tms_id an supports bridge_id, but bridge_id is blank" do
+      MockPublishing.should_receive(:find_by_tms_id).with(@tms_id){nil}
+      column_names = MockPublishing.column_names + ['bridge_id']
+      MockPublishing.stub(:column_names){column_names}
+      MockPublishing.should_not_receive(:find_by_bridge_id).with(@bridge_id)
+      controller.json['bridge_id'] = nil
+      controller.create      
     end
     
   end

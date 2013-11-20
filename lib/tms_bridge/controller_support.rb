@@ -53,7 +53,11 @@ RUBY
         self.update_only = options[:update_only]
       class_eval <<-RUBY, __FILE__, __LINE__+1
         def create
-          @#{self.bridged_resource} = block_given? ? yield(#{class_name}, @json) : #{class_name}.find_by_tms_id(@json['tms_id']) 
+          @#{self.bridged_resource} = #{class_name}.find_by_tms_id(@json['tms_id'])
+          
+          if @#{self.bridged_resource}.nil? && #{class_name}.column_names.include?('bridge_id') && !@json['bridge_id'].blank?
+            @#{self.bridged_resource} = #{class_name}.find_by_bridge_id(@json['bridge_id']) 
+          end
           
           @#{self.bridged_resource} = #{class_name}.new if @#{self.bridged_resource}.nil? && !self.update_only?
           if @#{self.bridged_resource}
