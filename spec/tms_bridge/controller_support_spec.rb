@@ -263,9 +263,20 @@ describe TmsBridge::ControllerSupport::Publish do
       controller.create
       controller.mock_publishing.called_save.should == true
     end
+    
     it "should call render " do
       controller.should_receive(:render).with(text: 'success')
       controller.create
     end
+    
+    it "should yield to find a model if block_given?" do
+      yielded = false
+      controller.create{
+        yielded = true
+        nil
+      }
+      yielded.should == true
+    end
+    
   end
 end
