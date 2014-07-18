@@ -1,7 +1,0 @@
-export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
-export RUBYOPT=-Ku
-export IRON_CACHE_TOKEN="6P0Hr8umXZruKzS3SbKF1vuu1E8"
-export IRON_CACHE_PROJECT_ID="50a79df0a6498073e700560c"
-export CC_BRIDGE_SALT="c7b5fae1-d719-4c8e-b92b-1c4c5e26ca10"
-
-rvm --create use 1.9.3@tms.bridge > /dev/null
