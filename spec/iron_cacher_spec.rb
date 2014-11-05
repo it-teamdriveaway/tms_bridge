@@ -12,7 +12,7 @@ describe IronCacher do
     end
     
     it "should use a separate config file from the iron.json" do
-      MockIronCache.iron_cache_client.project_id.should == ENV['IRON_CACHE_PROJECT_ID']
+      MockIronCache.iron_cache_client.project_id.should == JSON.parse(File.read("config/iron.json"))['project_id']
     end
 
   end

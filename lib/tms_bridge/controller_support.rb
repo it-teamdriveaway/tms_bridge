@@ -42,15 +42,20 @@ RUBY
     end
 
     module Publish
-      def publishes_tms(as, options={:update_only=>false})
+      def publishes_tms(as, options={})
         extend TmsBridge::ControllerSupport::Security unless (class << self; included_modules; end).include?(TmsBridge::ControllerSupport::Security)
         extend TmsBridge::ControllerSupport::Publish::ClassMethods unless (class << self; included_modules; end).include?(TmsBridge::ControllerSupport::Publish::ClassMethods)
         include TmsBridge::ControllerSupport::Publish::InstanceMethods unless included_modules.include?(TmsBridge::ControllerSupport::Publish::InstanceMethods)
 
         self.secure_tms_bridge(as)
-        class_name = self.bridged_resources.classify
         
+        class_name = self.bridged_resources.classify
+
+        options= options.reverse_merge({:update_only=>false, :model_params_key=>self.bridged_resource})
+
         self.update_only = options[:update_only]
+        self.model_params_key =  options[:model_params_key]
+        
       class_eval <<-RUBY, __FILE__, __LINE__+1
         def create
           @#{self.bridged_resource} = #{class_name}.find_by_tms_id(@json['tms_id'])
@@ -60,8 +65,9 @@ RUBY
           end
           
           @#{self.bridged_resource} = #{class_name}.new if @#{self.bridged_resource}.nil? && !self.update_only?
+
           if @#{self.bridged_resource}
-            @#{self.bridged_resource}.attributes = @json['#{self.bridged_resource}'].slice(*#{class_name}.published_attribute_names)
+            @#{self.bridged_resource}.attributes = @json[self.model_params_key.to_s].slice(*#{class_name}.published_attribute_names)
             @#{self.bridged_resource}.save(validate: false)
           end
           render text: 'success'
@@ -74,6 +80,8 @@ RUBY
       module ClassMethods
         def self.extended(base)
           base.class_attribute :update_only
+          base.class_attribute(:model_params_key)
+          
         end
       end
       
@@ -81,6 +89,8 @@ RUBY
         def update_only?
           self.class.update_only
         end
+        
+
       end
 
     end
@@ -91,6 +101,7 @@ RUBY
         include TmsBridge::ControllerSupport::Security::InstanceMethods
         extend TmsBridge::ControllerSupport::Security::ClassMethods
         self.as = as.to_s
+
         self.bridged_resources = self.name.split('::').last.gsub(/Controller/, '').underscore
         self.bridged_resource = self.bridged_resources.singularize
         self.queue_name = self.as + '_'+self.bridged_resources        
