@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 2.6"
+  spec.add_development_dependency "rspec", "~> 3"
   spec.add_dependency "actionpack", ">= 3.2.0"
   spec.add_dependency "activerecord", ">= 3.2.0"
   spec.add_dependency "uuidtools"

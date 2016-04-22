@@ -8,6 +8,10 @@ class MockModel
   def self.column_names
     ['updated_at', 'created_at', 'id', 'some_key']
   end
+  
+  def self.attribute_aliases
+    return {}
+  end
 
   def save(*args)
     self.called_save = true

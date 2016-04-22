@@ -34,7 +34,7 @@ GEM
       multi_json (~> 1.0)
     arel (3.0.2)
     builder (3.0.4)
-    diff-lcs (1.2.4)
+    diff-lcs (1.2.5)
     erubis (2.7.0)
     ethon (0.5.12)
       ffi (>= 1.3.0)
@@ -61,14 +61,19 @@ GEM
       rest-client (>= 0.3.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    rspec (2.13.0)
-      rspec-core (~> 2.13.0)
-      rspec-expectations (~> 2.13.0)
-      rspec-mocks (~> 2.13.0)
-    rspec-core (2.13.1)
-    rspec-expectations (2.13.0)
-      diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.13.1)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -86,5 +91,8 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.3)
   rake
-  rspec (~> 2.6)
+  rspec (~> 3)
   tms_bridge!
+
+BUNDLED WITH
+   1.11.2
