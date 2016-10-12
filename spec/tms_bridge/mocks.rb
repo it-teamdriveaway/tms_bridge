@@ -13,6 +13,10 @@ class MockModel
     return {}
   end
 
+  def self.monetized_attributes
+    return {}
+  end
+
   def save(*args)
     self.called_save = true
   end

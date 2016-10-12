@@ -3,6 +3,7 @@ module TmsBridge
     def published_attribute_names
       _attributes_names = self.column_names - %w{id created_at updated_at}
       _attributes_names+=self.attribute_aliases.keys
+      _attributes_names+=self.monetized_attributes.keys
       return _attributes_names.compact.map(&:to_s).uniq
     end
   end

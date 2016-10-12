@@ -19,10 +19,15 @@ describe TmsBridge::ModelSupport do
     it "should include items declared in column_names" do
       expect(MockModel.published_attribute_names).to include('some_key')
     end
-    
+
     it "should include alias_attributes" do
       expect(MockModel).to receive(:attribute_aliases){{"alias_key"=>"some_key"}}
       expect(MockModel.published_attribute_names).to include('alias_key')
+    end
+
+    it "should include monetized_attributes" do
+      expect(MockModel).to receive(:monetized_attributes){{"monetized_attribute"=>"cents_attribute"}}
+      expect(MockModel.published_attribute_names).to include('monetized_attribute')
     end
   end
 end
