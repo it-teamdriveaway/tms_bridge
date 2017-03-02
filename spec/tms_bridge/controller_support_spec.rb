@@ -165,14 +165,14 @@ describe TmsBridge::ControllerSupport::Redact do
       end
 
       it "should call render" do
-        expect(controller).to receive(:render).with(text: 'success')
+        expect(controller).to receive(:render).with(plain: 'success')
         controller.create
       end
 
       it "should not throw an error if the record is not found" do
         controller.json={'record_class'=>'MockModel', 'tms_id'=>MockModel::NOT_FOUND}.with_indifferent_access
         expect(controller.record).to be_nil
-        expect(controller).to receive(:render).with(text: 'success')
+        expect(controller).to receive(:render).with(plain: 'success')
         controller.create
       end
     end
@@ -217,10 +217,13 @@ describe TmsBridge::ControllerSupport::Publish do
   def widget_controller(params={})
     Class.new do
       extend TmsBridge::ControllerSupport::Publish
-      def self.before_filter(*args)
-      end
-      def self.name
-        "WidgetsController"
+      class << self
+        def before_action(*args)
+        end
+        alias_method :before_filter, :before_action
+        def name
+          "WidgetsController"
+        end
       end
       publishes_tms :some_client, params
     end
@@ -295,7 +298,7 @@ describe TmsBridge::ControllerSupport::Publish do
 
     it "should assign to attributes" do
       controller.create
-      expect(controller.mock_publishing.attributes).to eq @attributes
+      expect(controller.mock_publishing.attributes).to eq(ActionController::Parameters.new(@attributes).permit('some_key'))
     end
 
     it "it should call MockPublishing.find_by_tms_id" do
@@ -359,7 +362,7 @@ describe TmsBridge::ControllerSupport::Publish do
       controller.json={'record_class'=>'MockPublishing', 'tms_id'=>MockModel::FOUND, 'mock_publishing'=>@attributes}
       controller.create
       expect(controller.mock_publishing).to be_a(FoundMockPublishing)
-      expect(controller.mock_publishing.attributes).to eq @attributes
+      expect(controller.mock_publishing.attributes).to eq ActionController::Parameters.new(@attributes).permit("some_key")
     end
 
 

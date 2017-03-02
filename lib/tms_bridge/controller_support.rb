@@ -17,7 +17,7 @@ class_eval <<-RUBY, __FILE__, __LINE__+1
             if @record = @record_class.find_by_tms_id(json_params[:tms_id])
               @record.destroy
             end
-            render text: 'success'
+            render ActiveSupport::VERSION::MAJOR < 5 ? {text: 'success'} : {plain: 'success'}
           else
             head :ok
           end
@@ -92,6 +92,13 @@ RUBY
       def secure_tms_bridge(as)
         include TmsBridge::ControllerSupport::Security::InstanceMethods
         extend TmsBridge::ControllerSupport::Security::ClassMethods
+        
+        if ActiveSupport::VERSION::MAJOR < 5
+          before_filter :parse_iron_mq_json
+        else
+          before_action :parse_iron_mq_json
+        end
+        
         self.as = as.to_s
 
         self.bridged_resources = self.name.split('::').last.gsub(/Controller/, '').underscore
@@ -144,8 +151,6 @@ RUBY
           base.class_attribute(:as)
           base.class_attribute(:bridged_resource)
           base.class_attribute(:bridged_resources)
-        
-          base.before_filter :parse_iron_mq_json
         end
         
       end

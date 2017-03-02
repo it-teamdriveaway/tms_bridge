@@ -39,12 +39,15 @@ class MockController
   cattr_accessor :before_filters
   attr_accessor :json
   attr_reader :request
-  
-  def self.before_filter(filter)
-    @@before_filters ||= []
-    @@before_filters << filter
-  end
 
+  class << self
+    def before_action(filter)
+      @@before_filters ||= []
+      @@before_filters << filter
+    end
+    alias_method :before_filter, :before_action
+  end
+  
   def initialize
     @request = MockRequest.new
   end
