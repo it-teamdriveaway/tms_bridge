@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "uuidtools"
   spec.add_dependency "iron_cache"
   spec.add_dependency "typhoeus"
+  spec.add_dependency "money-rails"
 end
